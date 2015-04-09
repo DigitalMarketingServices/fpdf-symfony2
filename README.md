@@ -1,29 +1,11 @@
 FPDF for use with Symfony2
 ==========================
 
-[![Latest Stable Version](https://poser.pugx.org/royopa/fpdf-symfony2/v/stable.svg)](https://packagist.org/packages/royopa/fpdf-symfony2) [![Total Downloads](https://poser.pugx.org/royopa/fpdf-symfony2/downloads.svg)](https://packagist.org/packages/royopa/fpdf-symfony2) [![Latest Unstable Version](https://poser.pugx.org/royopa/fpdf-symfony2/v/unstable.svg)](https://packagist.org/packages/royopa/fpdf-symfony2) [![License](https://poser.pugx.org/royopa/fpdf-symfony2/license.svg)](https://packagist.org/packages/royopa/fpdf-symfony2)
-
 Uses FPDF 1.7, tested in Symfony 2.5+
 
-## Installation and Usage 
-
-Package available on [Composer](https://packagist.org/packages/royopa/fpdf-symfony2).
-
-If you're using Composer to manage dependencies, you can use
-
-    $ composer require "royopa/fpdf-symfony2": "dev-master"
-
-Or
-
-You can include the following in your composer.json file:
-
-```json
-{
-    "require": {
-        "royopa/fpdf-symfony2": "dev-master"
-    }
-}
-```
+Composer usage
+-----
+Refer to https://getcomposer.org/doc/05-repositories.md#using-private-repositories on how to include repos directly from VCS like github.com.
 
 Setup
 -----
