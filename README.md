@@ -14,8 +14,8 @@ And those to `app/autoload.php`:
 
 ```php
 $classMap = array(
-    'Fpdf_' => __DIR__.'/../vendor/royopa/fpdf-symfony2/lib/FPDF/FPDF.php',
-    'Fpdi_' => __DIR__.'/../vendor/royopa/fpdf-symfony2/lib/FPDF/FPDI.php'
+    'Fpdf_' => __DIR__.'/../vendor/digitalmarketingservices/fpdf-symfony2/lib/FPDF/FPDF.php',
+    'Fpdi_' => __DIR__.'/../vendor/digitalmarketingservicesroyopa/fpdf-symfony2/lib/FPDF/FPDI.php'
 );
 $loader->addClassMap($classMap);    
 ```
