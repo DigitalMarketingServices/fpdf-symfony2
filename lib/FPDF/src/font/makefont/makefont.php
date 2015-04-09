@@ -413,7 +413,7 @@ function MakeFont($fontfile, $afmfile, $enc='cp1252',
 		if(function_exists('gzcompress'))
 		{
 			$cmp=$basename.'.z';
-			$outputFiles[] = SaveToFile($cmp,gzcompress($file),'b', $options);
+			$outputFiles['compressed'] = SaveToFile($cmp,gzcompress($file),'b', $options);
 			$s.='$file=\''.$cmp."';\n";
 			echo 'Font file compressed ('.$cmp.')<br>';
 		}
@@ -436,7 +436,7 @@ function MakeFont($fontfile, $afmfile, $enc='cp1252',
 		$s.='$file='."'';\n";
 	}
 	$s.="?>\n";
-	$outputFiles[] = SaveToFile($basename.'.php',$s,'t', $options);
+	$outputFiles['php'] = SaveToFile($basename.'.php',$s,'t', $options);
 	echo 'Font definition file generated ('.$basename.'.php'.')<br>';
 
     return $outputFiles;
