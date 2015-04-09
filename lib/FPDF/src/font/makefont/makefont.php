@@ -229,8 +229,21 @@ function MakeFontEncoding($map)
 	return rtrim($s);
 }
 
-function SaveToFile($file, $s, $mode)
+/**
+ * @param $file
+ * @param $s
+ * @param $mode
+ * @param array $options
+ */
+function SaveToFile($file, $s, $mode, $options)
 {
+    if (!empty($options)) {
+        $outputDir = $options['output_dir'];
+        if (!empty($outputDir)) {
+            $file = $outputDir . DIRECTORY_SEPARATOR . $file;
+        }
+    }
+
 	$f=fopen($file,'w'.$mode);
 	if(!$f)
 		die('Can\'t write to file '.$file);
@@ -290,14 +303,18 @@ function CheckTTF($file)
 		echo '<b>Warning:</b> font license does not allow embedding';
 }
 
-/*******************************************************************************
-* fontfile: path to TTF file (or empty string if not to be embedded)           *
-* afmfile:  path to AFM file                                                   *
-* enc:      font encoding (or empty string for symbolic fonts)                 *
-* patch:    optional patch for encoding                                        *
-* type:     font type if fontfile is empty                                     *
-*******************************************************************************/
-function MakeFont($fontfile, $afmfile, $enc='cp1252', $patch=array(), $type='TrueType')
+/**
+ *
+ * @param string $fontfile: path to TTF file (or empty string if not to be embedded)
+ * @param string $afmfile:  path to AFM file
+ * @param string $enc:      font encoding (or empty string for symbolic fonts)
+ * @param array $patch:    optional patch for encoding
+ * @param string $type:     font type if fontfile is empty
+ * @param array $options:  array of options - optional
+ *                    ['output_dir' => '/some/path/on/disk']
+ */
+function MakeFont($fontfile, $afmfile, $enc='cp1252',
+                  $patch=array(), $type='TrueType', $options=array())
 {
 	//Generate a font definition file
 	if(get_magic_quotes_runtime())
@@ -390,7 +407,7 @@ function MakeFont($fontfile, $afmfile, $enc='cp1252', $patch=array(), $type='Tru
 		if(function_exists('gzcompress'))
 		{
 			$cmp=$basename.'.z';
-			SaveToFile($cmp,gzcompress($file),'b');
+			SaveToFile($cmp,gzcompress($file),'b', $options);
 			$s.='$file=\''.$cmp."';\n";
 			echo 'Font file compressed ('.$cmp.')<br>';
 		}
@@ -413,7 +430,7 @@ function MakeFont($fontfile, $afmfile, $enc='cp1252', $patch=array(), $type='Tru
 		$s.='$file='."'';\n";
 	}
 	$s.="?>\n";
-	SaveToFile($basename.'.php',$s,'t');
+	SaveToFile($basename.'.php',$s,'t', $options);
 	echo 'Font definition file generated ('.$basename.'.php'.')<br>';
 }
 ?>
