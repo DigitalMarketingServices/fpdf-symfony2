@@ -5,7 +5,7 @@ FPDF for use with Symfony2
 
 Uses FPDF 1.7, tested in Symfony 2.5+
 
-## Instalation and Usage 
+## Installation and Usage 
 
 Package available on [Composer](https://packagist.org/packages/royopa/fpdf-symfony2).
 
