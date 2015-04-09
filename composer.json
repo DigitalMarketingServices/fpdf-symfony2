@@ -1,12 +1,16 @@
 {
-    "name": "royopa/fpdf-symfony2",
+    "name": "digitalmarketingservices/fpdf-symfony2",
     "type": "library",
-    "description": "fpdf vendor for use with symfony2, based on toooni/fpdf",
+    "description": "fpdf vendor for use with symfony2, based on royopa/fpdf-symfony2",
     "keywords": [],
-    "homepage": "http://github.com/royopa",
+    "homepage": "http://github.com/digitalmarketingservices",
     "license": "BSD-3",
     "version": "1.0",
 	"authors": [
+	{
+	    "name": "Kevin Caporaso",
+	    "email": "alerts@capnet.cc"
+	},
         {
             "name": "Rodrigo Prado de Jesus",
             "email": "royopa@gmail.com"
