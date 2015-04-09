@@ -230,10 +230,12 @@ function MakeFontEncoding($map)
 }
 
 /**
- * @param $file
- * @param $s
- * @param $mode
+ * SaveToFile
+ * @param string $file
+ * @param string $s
+ * @param string $mode
  * @param array $options
+ * @return string
  */
 function SaveToFile($file, $s, $mode, $options)
 {
@@ -249,6 +251,8 @@ function SaveToFile($file, $s, $mode, $options)
 		die('Can\'t write to file '.$file);
 	fwrite($f,$s,strlen($s));
 	fclose($f);
+
+    return $file;
 }
 
 function ReadShort($f)
@@ -316,6 +320,8 @@ function CheckTTF($file)
 function MakeFont($fontfile, $afmfile, $enc='cp1252',
                   $patch=array(), $type='TrueType', $options=array())
 {
+    $outputFiles = array();
+
 	//Generate a font definition file
 	if(get_magic_quotes_runtime())
 		@set_magic_quotes_runtime(0);
@@ -407,7 +413,7 @@ function MakeFont($fontfile, $afmfile, $enc='cp1252',
 		if(function_exists('gzcompress'))
 		{
 			$cmp=$basename.'.z';
-			SaveToFile($cmp,gzcompress($file),'b', $options);
+			$outputFiles[] = SaveToFile($cmp,gzcompress($file),'b', $options);
 			$s.='$file=\''.$cmp."';\n";
 			echo 'Font file compressed ('.$cmp.')<br>';
 		}
@@ -430,7 +436,9 @@ function MakeFont($fontfile, $afmfile, $enc='cp1252',
 		$s.='$file='."'';\n";
 	}
 	$s.="?>\n";
-	SaveToFile($basename.'.php',$s,'t', $options);
+	$outputFiles[] = SaveToFile($basename.'.php',$s,'t', $options);
 	echo 'Font definition file generated ('.$basename.'.php'.')<br>';
+
+    return $outputFiles;
 }
 ?>
