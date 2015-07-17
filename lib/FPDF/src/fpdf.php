@@ -7,6 +7,9 @@
  * Author:  Olivier PLATHEY                                                     *
  *******************************************************************************/
 
+/**
+ * @author Kevin Caporaso : Integrated SpotColors (PANTONE), based on Olivier's PDF_SpotColor
+ */
 define('FPDF_VERSION','1.7');
 
 class FPDF
@@ -67,6 +70,7 @@ class FPDF
     var $creator;            // creator
     var $AliasNbPages;       // alias for total number of pages
     var $PDFVersion;         // PDF version number
+    var $SpotColors;         // Spot colors (pantone)
 
     /*******************************************************************************
      *                                                                              *
@@ -101,6 +105,7 @@ class FPDF
         $this->TextColor = '0 g';
         $this->ColorFlag = false;
         $this->ws = 0;
+        $this->SpotColors = array();
         // Font path
         if(defined('FPDF_FONTPATH'))
         {
@@ -1037,6 +1042,45 @@ class FPDF
         return '';
     }
 
+    /**
+     * SpotColor (PANTONE)
+     */
+    function AddSpotColor($name, $c, $m, $y, $k)
+    {
+        if(!isset($this->SpotColors[$name]))
+        {
+            $i=count($this->SpotColors)+1;
+            $this->SpotColors[$name]=array('i'=>$i,'c'=>$c,'m'=>$m,'y'=>$y,'k'=>$k);
+        }
+    }
+
+    function SetDrawSpotColor($name, $tint=100)
+    {
+        if(!isset($this->SpotColors[$name]))
+            $this->Error('Undefined spot color: '.$name);
+        $this->DrawColor=sprintf('/CS%d CS %.3F SCN',$this->SpotColors[$name]['i'],$tint/100);
+        if($this->page>0)
+            $this->_out($this->DrawColor);
+    }
+
+    function SetFillSpotColor($name, $tint=100)
+    {
+        if(!isset($this->SpotColors[$name]))
+            $this->Error('Undefined spot color: '.$name);
+        $this->FillColor=sprintf('/CS%d cs %.3F scn',$this->SpotColors[$name]['i'],$tint/100);
+        $this->ColorFlag=($this->FillColor!=$this->TextColor);
+        if($this->page>0)
+            $this->_out($this->FillColor);
+    }
+
+    function SetTextSpotColor($name, $tint=100)
+    {
+        if(!isset($this->SpotColors[$name]))
+            $this->Error('Undefined spot color: '.$name);
+        $this->TextColor=sprintf('/CS%d cs %.3F scn',$this->SpotColors[$name]['i'],$tint/100);
+        $this->ColorFlag=($this->FillColor!=$this->TextColor);
+    }
+
     /*******************************************************************************
      *                                                                              *
      *                              Protected methods                               *
@@ -1694,10 +1738,15 @@ class FPDF
         $this->_out('/XObject <<');
         $this->_putxobjectdict();
         $this->_out('>>');
+        $this->_out('/ColorSpace <<');
+        foreach($this->SpotColors as $color)
+            $this->_out('/CS'.$color['i'].' '.$color['n'].' 0 R');
+        $this->_out('>>');
     }
 
     function _putresources()
     {
+        $this->_putspotcolors();
         $this->_putfonts();
         $this->_putimages();
         // Resource dictionary
@@ -1707,6 +1756,21 @@ class FPDF
         $this->_putresourcedict();
         $this->_out('>>');
         $this->_out('endobj');
+    }
+
+    function _putspotcolors()
+    {
+        foreach($this->SpotColors as $name=>$color)
+        {
+            $this->_newobj();
+            $this->_out('[/Separation /'.str_replace(' ','#20',$name));
+            $this->_out('/DeviceCMYK <<');
+            $this->_out('/Range [0 1 0 1 0 1 0 1] /C0 [0 0 0 0] ');
+            $this->_out(sprintf('/C1 [%.3F %.3F %.3F %.3F] ',$color['c']/100,$color['m']/100,$color['y']/100,$color['k']/100));
+            $this->_out('/FunctionType 2 /Domain [0 1] /N 1>>]');
+            $this->_out('endobj');
+            $this->SpotColors[$name]['n']=$this->n;
+        }
     }
 
     function _putinfo()
