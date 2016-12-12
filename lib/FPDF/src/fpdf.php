@@ -9,6 +9,7 @@
 
 /**
  * @author Kevin Caporaso : Integrated SpotColors (PANTONE), based on Olivier's PDF_SpotColor
+ * @author Kevin Caporaso : Adding FontSpacing ability, based on http://stackoverflow.com/questions/11126354/fpdf-letter-spacing
  */
 define('FPDF_VERSION','1.7');
 
@@ -71,6 +72,7 @@ class FPDF
     var $AliasNbPages;       // alias for total number of pages
     var $PDFVersion;         // PDF version number
     var $SpotColors;         // Spot colors (pantone)
+    var $FontSpacingPt;      // Font spacing (pt)
 
     /*******************************************************************************
      *                                                                              *
@@ -106,6 +108,8 @@ class FPDF
         $this->ColorFlag = false;
         $this->ws = 0;
         $this->SpotColors = array();
+        $this->FontSpacingPt = '';
+
         // Font path
         if(defined('FPDF_FONTPATH'))
         {
@@ -558,6 +562,24 @@ class FPDF
         $this->FontSize = $size/$this->k;
         if($this->page>0)
             $this->_out(sprintf('BT /F%d %.2F Tf ET',$this->CurrentFont['i'],$this->FontSizePt));
+    }
+
+    /**
+     * Ability to override font spacing.
+     *
+     * @param $size
+     */
+    function SetFontSpacing( $size ) {
+        if ( $this->FontSpacingPt == $size ) {
+            return;
+        }
+
+        $this->FontSpacingPt = $size;
+        $this->FontSpacing = $size / $this->k;
+
+        if ( $this->page > 0 ) {
+            $this->_out( sprintf( 'BT %.3f Tc ET', $size ) );
+        }
     }
 
     function AddLink()
