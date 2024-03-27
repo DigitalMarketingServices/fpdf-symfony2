@@ -9,6 +9,8 @@
 
 /**
  * @author Kevin Caporaso : Integrated SpotColors (PANTONE), based on Olivier's PDF_SpotColor
+ * @author Kevin Caporaso : Adding FontSpacing ability, based on http://stackoverflow.com/questions/11126354/fpdf-letter-spacing
+ * @author Kevin Caporaso : Adding Circle/Ellipse functionality
  */
 define('FPDF_VERSION','1.7');
 
@@ -71,6 +73,7 @@ class FPDF
     var $AliasNbPages;       // alias for total number of pages
     var $PDFVersion;         // PDF version number
     var $SpotColors;         // Spot colors (pantone)
+    var $FontSpacingPt;      // Font spacing (pt)
 
     /*******************************************************************************
      *                                                                              *
@@ -106,6 +109,8 @@ class FPDF
         $this->ColorFlag = false;
         $this->ws = 0;
         $this->SpotColors = array();
+        $this->FontSpacingPt = '';
+
         // Font path
         if(defined('FPDF_FONTPATH'))
         {
@@ -558,6 +563,24 @@ class FPDF
         $this->FontSize = $size/$this->k;
         if($this->page>0)
             $this->_out(sprintf('BT /F%d %.2F Tf ET',$this->CurrentFont['i'],$this->FontSizePt));
+    }
+
+    /**
+     * Ability to override font spacing.
+     *
+     * @param $size
+     */
+    function SetFontSpacing( $size ) {
+        if ( $this->FontSpacingPt == $size ) {
+            return;
+        }
+
+        $this->FontSpacingPt = $size;
+        $this->FontSpacing = $size / $this->k;
+
+        if ( $this->page > 0 ) {
+            $this->_out( sprintf( 'BT %.3f Tc ET', $size ) );
+        }
     }
 
     function AddLink()
@@ -1079,6 +1102,60 @@ class FPDF
             $this->Error('Undefined spot color: '.$name);
         $this->TextColor=sprintf('/CS%d cs %.3F scn',$this->SpotColors[$name]['i'],$tint/100);
         $this->ColorFlag=($this->FillColor!=$this->TextColor);
+    }
+
+    /**
+     * Circle and Ellipse related as from: http://www.fpdf.org/en/script/script6.php
+     */
+
+    /**
+     * @param $x
+     * @param $y
+     * @param $r
+     * @param string $style
+     */
+    function Circle($x, $y, $r, $style='D')
+    {
+        $this->Ellipse($x,$y,$r,$r,$style);
+    }
+
+    /**
+     * @param $x
+     * @param $y
+     * @param $rx
+     * @param $ry
+     * @param string $style
+     */
+    function Ellipse($x, $y, $rx, $ry, $style='D')
+    {
+        if($style=='F')
+            $op='f';
+        elseif($style=='FD' || $style=='DF')
+            $op='B';
+        else
+            $op='S';
+        $lx=4/3*(M_SQRT2-1)*$rx;
+        $ly=4/3*(M_SQRT2-1)*$ry;
+        $k=$this->k;
+        $h=$this->h;
+        $this->_out(sprintf('%.2F %.2F m %.2F %.2F %.2F %.2F %.2F %.2F c',
+            ($x+$rx)*$k,($h-$y)*$k,
+            ($x+$rx)*$k,($h-($y-$ly))*$k,
+            ($x+$lx)*$k,($h-($y-$ry))*$k,
+            $x*$k,($h-($y-$ry))*$k));
+        $this->_out(sprintf('%.2F %.2F %.2F %.2F %.2F %.2F c',
+            ($x-$lx)*$k,($h-($y-$ry))*$k,
+            ($x-$rx)*$k,($h-($y-$ly))*$k,
+            ($x-$rx)*$k,($h-$y)*$k));
+        $this->_out(sprintf('%.2F %.2F %.2F %.2F %.2F %.2F c',
+            ($x-$rx)*$k,($h-($y+$ly))*$k,
+            ($x-$lx)*$k,($h-($y+$ry))*$k,
+            $x*$k,($h-($y+$ry))*$k));
+        $this->_out(sprintf('%.2F %.2F %.2F %.2F %.2F %.2F c %s',
+            ($x+$lx)*$k,($h-($y+$ry))*$k,
+            ($x+$rx)*$k,($h-($y+$ly))*$k,
+            ($x+$rx)*$k,($h-$y)*$k,
+            $op));
     }
 
     /*******************************************************************************
